@@ -411,6 +411,18 @@ form {
 defined('MYAAC') or die('Direct access not allowed!');
 $title = 'Create Auction';
 
+if(!$logged){
+	if(!empty($errors))
+		$twig->display('error_box.html.twig', array('errors' => $errors));
+
+	$twig->display('account.login.html.twig', array(
+		'redirect' => isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : null,
+		'account' => USE_ACCOUNT_NAME ? 'Name' : 'Number',
+		'account_login_by' => getAccountLoginByLabel(),
+		'error' => isset($errors[0]) ? $errors[0] : null
+	));
+	return;
+}
 
 $getAccountCoins = $db->query('SELECT `id`, `premdays`, `coins`' . 'FROM `accounts`' . 'WHERE `id` = ' . $account_logged->getId() .'');
 $getAccountCoins = $getAccountCoins->fetch();
@@ -424,18 +436,6 @@ if($logged){
 $groups = new OTS_Groups_List();
 $config_salt_enabled = $db->hasColumn('accounts', 'salt');
 
-if(!$logged){
-	if(!empty($errors))
-		$twig->display('error_box.html.twig', array('errors' => $errors));
-
-	$twig->display('account.login.html.twig', array(
-		'redirect' => isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : null,
-		'account' => USE_ACCOUNT_NAME ? 'Name' : 'Number',
-		'account_login_by' => getAccountLoginByLabel(),
-		'error' => isset($errors[0]) ? $errors[0] : null
-	));
-	return;
-}
 
 /* CHAR BAZAAR CONFIG */
 
