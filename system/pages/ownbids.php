@@ -17,6 +17,11 @@
 defined('MYAAC') or die('Direct access not allowed!');
 $title = 'My Bids';
 
+if (!$account_logged){
+  header('Location: '. getLink('account/manage'));
+  return;
+}
+
 $getAccountCoins = $db->query('SELECT `id`, `premdays`, `coins`' . 'FROM `accounts`' . 'WHERE `id` = ' . $account_logged->getId() .'');
 $getAccountCoins = $getAccountCoins->fetch();
 ?>
