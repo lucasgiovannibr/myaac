@@ -101,6 +101,16 @@ class OTS_Account extends OTS_Row_DAO implements IteratorAggregate, Countable
         return $name;
     }
 
+    public function getCoinsById($id){
+        $query = $this->db->query('SELECT `coins` FROM `accounts` WHERE `id` = ' . $this->db->quote($id) )->fetch();
+        return $query['coins'];
+    }
+
+    public function getTournamentById($id){
+        $query = $this->db->query('SELECT `tournamentBalance` FROM `accounts` WHERE `id` = ' . $this->db->quote($id) )->fetch();
+        return $query['tournamentBalance'];
+    }
+
 /**
  * Creates new account.
  *

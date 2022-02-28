@@ -73,7 +73,8 @@ $errors = array();
 			$account_premdays = $account_logged->getPremDays();
 		}
 		
-		$account_coins = $account_logged->getPremDays();
+    	$account_coins = $account_logged->getCoinsById($account_logged->getId());
+		$tournamentBalance = $account_logged->getTournamentById($account_logged->getId());
 		
 		if(!$account_logged->isPremium()) {
 			$account_status = '<b><span style="color: red;">Free Account</span></b>';
@@ -144,7 +145,8 @@ $errors = array();
 			'account_rlname' => $account_rlname,
 			'account_location' => $account_location,
 			'actions' => $actions,
-			'players' => $account_players
+			'players' => $account_players,
+        	'tournamentBalance' => $tournamentBalance
 		));
 	}
 	else {
