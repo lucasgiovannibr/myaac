@@ -10,172 +10,192 @@
  */
 defined('MYAAC') or die('Direct access not allowed!');
 
-class Spells {
-	private static $spellsList = null;
-	private static $lastError = '';
-
-	// 1 - attack, 2 - healing, 3 - summon, 4 - supply, 5 - support
-	public static function loadGroup($tGroup) {
-		switch ($tGroup) {
-			case "attack":
-				return 1;
-			case "healing":
-				return 2;
-			case "summon":
-				return 3;
-			case "supply":
-				return 4;
-			case "support":
-				return 5;
-		}
-	}
-
-		public static function loadFromXML($show = false) {
-		global $config, $db;
-
-		try { $db->exec('DELETE FROM `' . TABLE_PREFIX . 'spells`;'); } catch(PDOException $error) {}
-
-		if($show) {
-			echo '<h2>Reload spells.</h2>';
-			echo '<h2>All records deleted from table <b>' . TABLE_PREFIX . 'spells</b> in database.</h2>';
-		}
-
-		try {
-			self::$spellsList = new OTS_SpellsList($config['data_path'].'spells/spells.xml');
-		}
-		catch(Exception $e) {
-			self::$lastError = $e->getMessage();
-			return false;
-		}
-
-		//add conjure spells
-		$conjurelist = self::$spellsList->getConjuresList();
-		if($show) {
-			echo "<h3>Conjure:</h3>";
-		}
-
-		foreach($conjurelist as $spellname) {
-			$spell = self::$spellsList->getConjure($spellname);
-			$name = $spell->getName();
-
-			$words = $spell->getWords();
-			if(strpos($words, '#') !== false)
-				continue;
-
-			try {
-				$db->insert(TABLE_PREFIX . 'spells', array(
-					'name' => $name,
-					'words' => $words,
-					'type' => 2,
-					'mana' => $spell->getMana(),
-					'level' => $spell->getLevel(),
-					'maglevel' => $spell->getMagicLevel(),
-					'soul' => $spell->getSoul(),
-					'premium' => $spell->isPremium() ? 1 : 0,
-					'vocations' => json_encode($spell->getVocations()),
-					'conjure_count' => $spell->getConjureCount(),
-					'conjure_id' => $spell->getConjureId(),
-					'reagent' => $spell->getReagentId(),
-					'hidden' => $spell->isEnabled() ? 0 : 1
-				));
-
-				if($show) {
-					success('Added: ' . $name . '<br/>');
-				}
-			}
-			catch(PDOException $error) {
-				if($show) {
-					warning('Error while adding spell (' . $name . '): ' . $error->getMessage());
-				}
-			}
-		}
-
-		// add instant spells
-		$instantlist = self::$spellsList->getInstantsList();
-		if($show) {
-			echo "<h3>Instant:</h3>";
-		}
-
-		foreach($instantlist as $spellname) {
-			$spell = self::$spellsList->getInstant($spellname);
-			$name = $spell->getName();
-
-			$words = $spell->getWords();
-			if(strpos($words, '#') !== false)
-				continue;
-
-			try {
-				$db->insert(TABLE_PREFIX . 'spells', array(
-					'name' => $name,
-					'words' => $words,
-					'type' => 1,
-					'mana' => $spell->getMana(),
-					'level' => $spell->getLevel(),
-					'maglevel' => $spell->getMagicLevel(),
-					'soul' => $spell->getSoul(),
-					'premium' => $spell->isPremium() ? 1 : 0,
-					'vocations' => json_encode($spell->getVocations()),
-					'conjure_count' => 0,
-					'hidden' => $spell->isEnabled() ? 0 : 1
-				));
-
-				if($show) {
-					success('Added: ' . $name . '<br/>');
-				}
-			}
-			catch(PDOException $error) {
-				if($show) {
-					warning('Error while adding spell (' . $name . '): ' . $error->getMessage());
-				}
-			}
-		}
-
-		// add runes
-		$runeslist = self::$spellsList->getRunesList();
-		if($show) {
-			echo "<h3>Runes:</h3>";
-		}
-
-		foreach($runeslist as $spellname) {
-			$spell = self::$spellsList->getRune($spellname);
-
-			$name = $spell->getName() . ' Rune';
-
-			try {
-				$db->insert(TABLE_PREFIX . 'spells', array(
-					'name' => $name,
-					'words' => $spell->getWords(),
-					'type' => 3,
-					'mana' => $spell->getMana(),
-					'level' => $spell->getLevel(),
-					'maglevel' => $spell->getMagicLevel(),
-					'soul' => $spell->getSoul(),
-					'premium' => $spell->isPremium() ? 1 : 0,
-					'vocations' => json_encode($spell->getVocations()),
-					'conjure_count' => 0,
-					'item_id' => $spell->getID(),
-					'hidden' => $spell->isEnabled() ? 0 : 1
-				));
-
-				if($show) {
-					success('Added: ' . $name . '<br/>');
-				}
-			}
-			catch(PDOException $error) {
-				if($show) {
-					warning('Error while adding spell (' . $name . '): ' . $error->getMessage());
-				}
-			}
-		}
-
-		return true;
-	}
-
-	public static function getSpellsList() {
-		return self::$spellsList;
-	}
-
-	public static function getLastError() {
-		return self::$lastError;
-	}
+/**
+ * Class Spells
+ *
+ * @package ${NAMESPACE}
+ * @author  William Alvares <william@uilia.com.br>
+ * @date    28/02/2022
+ */
+class Spells
+{
+    /**
+     * @var null
+     */
+    private static $spellsList = null;
+    /**
+     * @var string
+     */
+    private static $lastError = '';
+    
+    // 1 - attack, 2 - healing, 3 - summon, 4 - supply, 5 - support
+    
+    /**
+     * @param $tGroup
+     *
+     * @return int|void
+     */
+    public static function loadGroup($tGroup)
+    {
+        switch ($tGroup) {
+            case "attack":
+                return 1;
+            case "healing":
+                return 2;
+            case "summon":
+                return 3;
+            case "supply":
+                return 4;
+            case "support":
+                return 5;
+        }
+    }
+    
+    /**
+     * @param false $show
+     *
+     * @return bool
+     */
+    public static function loadFromXML($show = false)
+    {
+        global $config, $db;
+        
+        try {
+            $db->exec('DELETE FROM `' . TABLE_PREFIX . 'spells`;');
+        } catch (PDOException $error) {
+        }
+        
+        if ($show) {
+            echo '<h2>Reload spells.</h2>';
+            echo '<h2>All records deleted from table <b>' . TABLE_PREFIX . 'spells</b> in database.</h2>';
+        }
+        
+        try {
+            self::$spellsList = new OTS_SpellsParseLua($config['data_path'] . 'scripts/spells');
+        } catch (Exception $e) {
+            self::$lastError = $e->getMessage();
+            return false;
+        }
+        
+        //add conjure spells
+        $listArray = self::$spellsList->get();
+        
+        if ($show) {
+            echo "<h3>Conjure:</h3>";
+        }
+        
+        foreach ($listArray['conjuring'] as $spellname) {
+            try {
+                $db->insert(TABLE_PREFIX . 'spells', array(
+                    'name'          => ucwords($spellname['name'] ?? '') . " Conjure",
+                    'words'         => $spellname['words'] ?? '',
+                    'type'          => 2,
+                    'mana'          => $spellname['mana'] ?? 0,
+                    'level'         => $spellname['level'] ?? 0,
+                    'maglevel'      => $spellname['magicLevel'] ?? 0,
+                    'soul'          => $spellname['soul'] ?? 0,
+                    'premium'       => boolval($spellname['isPremium']) === true ? 1 : 0,
+                    'vocations'     => json_encode($spellname['vocation'] ?? []),
+                    'conjure_count' => null,
+                    'conjure_id'    => null,
+                    'reagent'       => null,
+                    'item_id'       => $spellname['runeId'] ?? null,
+                    'hidden'        => ($spellname['active'] ? 0 : 1)
+                ));
+                
+                if ($show) {
+                    success('Added: ' . $spellname['name'] . '<br/>');
+                }
+            } catch (PDOException $error) {
+                if ($show) {
+                    warning('Error while adding spell (' . $spellname['name'] . '): ' . $error->getMessage());
+                }
+            }
+        }
+        
+        // add instant spells
+        if ($show) {
+            echo "<h3>Instant:</h3>";
+        }
+        
+        foreach ($listArray['instant'] as $spellname) {
+            try {
+                $db->insert(TABLE_PREFIX . 'spells', array(
+                    'name'          => ucwords($spellname['name'] ?? '') . " Spell",
+                    'words'         => $spellname['words'] ?? '',
+                    'type'          => 1,
+                    'mana'          => $spellname['mana'] ?? 0,
+                    'level'         => $spellname['level'] ?? 0,
+                    'maglevel'      => $spellname['magicLevel'] ?? 0,
+                    'soul'          => $spellname['soul'] ?? 0,
+                    'premium'       => boolval($spellname['isPremium']) === true ? 1 : 0,
+                    'vocations'     => json_encode($spellname['vocation'] ?? []),
+                    'conjure_count' => null,
+                    'conjure_id'    => null,
+                    'reagent'       => null,
+                    'hidden'        => ($spellname['active'] ? 0 : 1)
+                ));
+                
+                if ($show) {
+                    success('Added: ' . $spellname['name'] . '<br/>');
+                }
+            } catch (PDOException $error) {
+                if ($show) {
+                    warning('Error while adding spell (' . $spellname['name'] . '): ' . $error->getMessage());
+                }
+            }
+        }
+        
+        // add runes
+        if ($show) {
+            echo "<h3>Runes:</h3>";
+        }
+        
+        foreach ($listArray['runes'] as $spellname) {
+            try {
+                $db->insert(TABLE_PREFIX . 'spells', array(
+                    'name'          => ucwords($spellname['name'] ?? ''),
+                    'words'         => $spellname['words'] ?? '',
+                    'type'          => 3,
+                    'mana'          => $spellname['mana'] ?? 0,
+                    'level'         => $spellname['level'] ?? 0,
+                    'maglevel'      => $spellname['magicLevel'] ?? 0,
+                    'soul'          => $spellname['soul'] ?? 0,
+                    'premium'       => boolval($spellname['isPremium']) === true ? 1 : 0,
+                    'vocations'     => json_encode($spellname['vocation'] ?? []),
+                    'conjure_count' => null,
+                    'conjure_id'    => null,
+                    'reagent'       => null,
+                    'item_id'       => $spellname['runeId'] ?? null,
+                    'hidden'        => ($spellname['active'] ? 0 : 1)
+                ));
+                
+                if ($show) {
+                    success('Added: ' . $spellname['name'] . '<br/>');
+                }
+            } catch (PDOException $error) {
+                if ($show) {
+                    warning('Error while adding spell (' . $spellname['name'] . '): ' . $error->getMessage());
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * @return null
+     */
+    public static function getSpellsList()
+    {
+        return self::$spellsList;
+    }
+    
+    /**
+     * @return string
+     */
+    public static function getLastError()
+    {
+        return self::$lastError;
+    }
 }
