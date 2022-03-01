@@ -4,7 +4,7 @@ MyAAC é um Automatic Account Creator (AAC) gratuito e de código aberto escrito
 
 
 
-### Informações
+### Information
 
 
 Changed box shadow image to css
@@ -31,10 +31,12 @@ Changed login by email
 
 
 
-### Configuração
+### Settings
 
+Rename *config.example.php* to *config.php*.
+Use *config.local.php* for your local configuration changes.
 
-Verifique *config.php* para obter mais informações.
+Renomeie o *config.example.php* para *config.php*.
 Use *config.local.php* para suas alterações de configuração local. 
 
 
