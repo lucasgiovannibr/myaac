@@ -89,6 +89,10 @@ class Spells
                 continue;
             }
             
+            if (empty($spellname)) {
+                continue;
+            }
+            
             try {
                 $db->insert(TABLE_PREFIX . 'spells', array(
                     'name'          => ucwords($spellname['name'] ?? '') . " Conjure",
@@ -98,7 +102,7 @@ class Spells
                     'level'         => $spellname['level'] ?? 0,
                     'maglevel'      => $spellname['magicLevel'] ?? 0,
                     'soul'          => $spellname['soul'] ?? 0,
-                    'premium'       => boolval($spellname['isPremium']) === true ? 1 : 0,
+                    'premium'       => boolval($spellname['isPremium'] ?? false) === true ? 1 : 0,
                     'vocations'     => json_encode($spellname['vocation'] ?? []),
                     'conjure_count' => null,
                     'conjure_id'    => null,
@@ -126,6 +130,10 @@ class Spells
             if (isset($spellname['ignore'])) {
                 continue;
             }
+    
+            if (empty($spellname)) {
+                continue;
+            }
             
             try {
                 $db->insert(TABLE_PREFIX . 'spells', array(
@@ -136,7 +144,7 @@ class Spells
                     'level'         => $spellname['level'] ?? 0,
                     'maglevel'      => $spellname['magicLevel'] ?? 0,
                     'soul'          => $spellname['soul'] ?? 0,
-                    'premium'       => boolval($spellname['isPremium']) === true ? 1 : 0,
+                    'premium'       => boolval($spellname['isPremium'] ?? false) === true ? 1 : 0,
                     'vocations'     => json_encode($spellname['vocation'] ?? []),
                     'conjure_count' => null,
                     'conjure_id'    => null,
@@ -163,6 +171,10 @@ class Spells
             if (isset($spellname['ignore'])) {
                 continue;
             }
+    
+            if (empty($spellname)) {
+                continue;
+            }
             
             try {
                 $db->insert(TABLE_PREFIX . 'spells', array(
@@ -173,7 +185,7 @@ class Spells
                     'level'         => $spellname['level'] ?? 0,
                     'maglevel'      => $spellname['magicLevel'] ?? 0,
                     'soul'          => $spellname['soul'] ?? 0,
-                    'premium'       => boolval($spellname['isPremium']) === true ? 1 : 0,
+                    'premium'       => boolval($spellname['isPremium'] ?? false) === true ? 1 : 0,
                     'vocations'     => json_encode($spellname['vocation'] ?? []),
                     'conjure_count' => null,
                     'conjure_id'    => null,

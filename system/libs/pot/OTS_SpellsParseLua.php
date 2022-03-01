@@ -194,7 +194,7 @@ class OTS_SpellsParseLua
         $p = 0;
         
         if (preg_match('/(\d+)(?:\s*)([\+\-\*\/])(?:\s*)(\d+)/', $value, $matches) !== false) {
-            $operator = $matches[2];
+            $operator = $matches[2] ?? null;
             
             switch ($operator) {
                 case '+':
